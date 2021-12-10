@@ -1,56 +1,87 @@
+import pytest
 from typing import List
 from statistics import median
 
-from utils import get_input_text
+from utils import get_input_text, get_example_input_text
+
+EXPECTED_1 = 26397
+EXPECTED_2 = 288957
 
 ERROR_SCORE_MAP = {')': 3, ']': 57, '}': 1197, '>': 25137}
 COMPLETION_SCORE_MAP = {')': 1, ']': 2, '}': 3, '>': 4}
-OPENERS = ['(', '[', '{', '<']
-MATCHES = {')': '(', ']': '[', '}': '{', '>': '<'}
-REVERSE_MATCHES = {v: k for k, v in MATCHES.items()}
+FORWARD = {'(': ')', '[': ']', '{': '}', '<': '>'}
+REVERSE = {v: k for k, v in FORWARD.items()}
 
 
-def get_input_data() -> List[List[int]]:
-    input_text = get_input_text(10)
+def get_input_data(example=False):
+    if example:
+        input_text = get_example_input_text()
+    else:
+        input_text = get_input_text(10)
     return input_text.splitlines()
 
 
-lines = get_input_data()
+lines = get_input_data(True)
 
-# part 1
-corrupted_lines = []
-syntax_score = 0
-for ind, line in enumerate(lines):
-    open_chunks = []
-    for c in line:
-        if c in OPENERS:
-            open_chunks.append(c)
-        elif MATCHES[c] != open_chunks.pop():
-            syntax_score += ERROR_SCORE_MAP[c]
-            corrupted_lines.append(ind)
-            break
 
-print(f'Part 1: {syntax_score}')
+def get_syntax_error_score(lines: List[str]) -> int:
+    syntax_score = 0
+    for line in lines:
+        open_chunks = []
+        for c in line:
+            if c in FORWARD:
+                open_chunks.append(c)
+            elif REVERSE[c] != open_chunks.pop():
+                syntax_score += ERROR_SCORE_MAP[c]
+                break
 
-# part 2
-scores = []
-for ind, line in enumerate(lines):
-    if ind in corrupted_lines:
-        continue
+    return syntax_score
 
-    line_score = 0
-    open_chunks = []
-    for c in line:
-        if c in OPENERS:
-            open_chunks.append(c)
+
+def get_completion_middle_score(lines: List[str]) -> int:
+    scores = []
+    for line in lines:
+        line_score = 0
+        open_chunks = []
+        for c in line:
+            if c in FORWARD:
+                open_chunks.append(c)
+            elif REVERSE[c] != open_chunks.pop():
+                break
         else:
-            open_chunks.pop()
+            for open_chunk in reversed(open_chunks):
+                line_score *= 5
+                line_score += COMPLETION_SCORE_MAP[FORWARD[open_chunk]]
+            scores.append(line_score)
 
-    for open_chunk in reversed(open_chunks):
-        completion_char = REVERSE_MATCHES[open_chunk]
-        line_score *= 5
-        line_score += COMPLETION_SCORE_MAP[completion_char]
+    return int(median(scores))
 
-    scores.append(line_score)
 
-print(f'Part 2: {median(scores)}')
+@pytest.mark.parametrize(
+    ('input', 'expected'),
+    ((get_input_data(example=True), EXPECTED_1), ),
+)
+def test_part_1(input: str, expected: int) -> None:
+    assert get_syntax_error_score(input) == expected
+
+
+@pytest.mark.parametrize(
+    ('input', 'expected'),
+    ((get_input_data(example=True), EXPECTED_2), ),
+)
+def test_part_2(input: str, expected: int) -> None:
+    assert get_completion_middle_score(input) == expected
+
+
+def main():
+    # part 1
+    syntax_error_score = get_syntax_error_score(lines)
+    print(f'Part 1: {syntax_error_score}')
+
+    # part 2
+    completion_score = get_completion_middle_score(lines)
+    print(f'Part 2: {completion_score}')
+
+
+if __name__ == '__main__':
+    main()
