@@ -21,7 +21,7 @@ def get_input_data(example=False):
     return input_text.splitlines()
 
 
-lines = get_input_data(True)
+lines = get_input_data()
 
 
 def get_syntax_error_score(lines: List[str]) -> int:
