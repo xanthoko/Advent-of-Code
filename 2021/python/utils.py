@@ -18,7 +18,6 @@ def get_input_text_from_url(day):
     Raises:
         ValueError: Session cookie is invalid
     """
-    # NOTE: the cookie might need to be refreshed
     session_cookie = '53616c7465645f5f1f96053cb690c9c84213d85d199789b6d7c3c4545a7'\
                      '189d07e962cc6fbb0dc9dfcae08df56ccc9c0'
     cookies = {'session': session_cookie}

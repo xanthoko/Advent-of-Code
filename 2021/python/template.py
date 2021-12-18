@@ -17,7 +17,7 @@ def get_input_data(example=False) -> None:
     return
 
 
-input_data = get_input_data(False)
+input_data = get_input_data(True)
 
 
 def solve_1() -> int:
