@@ -31,11 +31,9 @@ def solve_2() -> int:
 
 
 def solve():
-    # part 1
     part_1 = solve_1()
     print(f'Part 1: {part_1}')
 
-    # part 2
     part_2 = solve_2()
     print(f'Part 2: {part_2}')
 
