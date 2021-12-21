@@ -1,3 +1,5 @@
+from math import prod
+from dataclasses import dataclass
 from typing import List, Dict, Tuple
 
 from utils import get_input_text
@@ -14,78 +16,107 @@ def get_input_data(example=False) -> None:
         input_text = EXAMPLE_INPUT
     else:
         input_text = get_input_text(16)
-    # TODO: implement code here
     return input_text.strip()
 
 
-input_data = get_input_data()
+@dataclass
+class Packet:
+    version: int
+    type_id: str
+    body: str
 
 
-def _split_packet(packet: str) -> Tuple[int, str, str]:
-    version = packet[:3]
-    dec_version = int(version, 2)
+input_data = get_input_data(True)
+
+
+def _create_packet(packet: str) -> Tuple[int, str, str]:
+    version = int(packet[:3], 2)
     type_id = packet[3:6]
     body = packet[6:]
-    return dec_version, type_id, body
+    return Packet(version=version, type_id=type_id, body=body)
+
 
 
 def analyze_packet(packet: str) -> Tuple[int, int]:
-    version, type_id, body = _split_packet(packet)
+    packet = _create_packet(packet)
     header_bits = 6
-    sum_of_versions = version
+    sum_of_versions = packet.version
 
-    if type_id == '100':
+    if packet.type_id == '100':
         current_index = 0
-        first_char = body[current_index]
+        first_char = packet.body[current_index]
         literal_number = ''
         # 10101 10010 01001
         while first_char == '1':
-            literal_number += body[current_index + 1:current_index + 5]
+            literal_number += packet.body[current_index + 1:current_index + 5]
             current_index += 5
-            first_char = body[current_index]
+            first_char = packet.body[current_index]
         # last number
-        literal_number += body[current_index + 1:current_index + 5]
+        literal_number += packet.body[current_index + 1:current_index + 5]
         # sum offset = header + end of 5-bit numbers
         packet_total_length = header_bits + current_index + 5
+        value = int(literal_number, 2)
     else:
-        length_type_id = body[0]
+        sub_packet_values = []
+        length_type_id = packet.body[0]
         # first bit of body is length type id
         if length_type_id == '0':
             # next 15 bits are total sub packets length
             # next sub_packets_length bits is the length of the sub packets
-            sub_packets_length = int(body[1:16], 2)
-            sub_packets = body[16:]
+            sub_packets_length = int(packet.body[1:16], 2)
+            sub_packets = packet.body[16:]
             index = 0
             while index < sub_packets_length:
-                v, o = analyze_packet(sub_packets)
-                sum_of_versions += v
+                ver, o, val = analyze_packet(sub_packets)
+                sum_of_versions += ver
                 sub_packets = sub_packets[o:]
+                sub_packet_values.append(val)
                 index += o
             packet_total_length = sub_packets_length + 15 + 1 + header_bits
         else:
             # next 11 bits show the number of sub packets
             # unknow number of bits for sub packets
-            number_of_subs = int(body[1:12], 2)
-            sub_packets = body[12:]
+            number_of_subs = int(packet.body[1:12], 2)
+            sub_packets = packet.body[12:]
             index = 0
             for _ in range(number_of_subs):
-                v, o = analyze_packet(sub_packets)
-                sum_of_versions += v
+                ver, o, val = analyze_packet(sub_packets)
+                sum_of_versions += ver
                 sub_packets = sub_packets[o:]
+                sub_packet_values.append(val)
                 index += o
             packet_total_length = index + 11 + 1 + header_bits
 
-    return sum_of_versions, packet_total_length
+        # find value
+        if packet.type_id == '000':
+            value = sum(sub_packet_values)
+        elif packet.type_id == '001':
+            value = prod(sub_packet_values)
+        elif packet.type_id == '010':
+            value = min(sub_packet_values)
+        elif packet.type_id == '011':
+            value = max(sub_packet_values)
+        elif packet.type_id == '101':
+            value = int(sub_packet_values[0] > sub_packet_values[1])
+        elif packet.type_id == '110':
+            value = int(sub_packet_values[0] < sub_packet_values[1])
+        elif packet.type_id == '111':
+            value = int(sub_packet_values[0] == sub_packet_values[1])
+
+    return sum_of_versions, packet_total_length, value
+
 
 
 def solve_1() -> int:
     packet = bin(int(input_data, 16))[2:].zfill(len(input_data) * 4)
-    sum_of_versions, _ = analyze_packet(packet)
+    sum_of_versions, *_ = analyze_packet(packet)
     return sum_of_versions
 
 
 def solve_2() -> int:
-    pass
+    packet = bin(int(input_data, 16))[2:].zfill(len(input_data) * 4)
+    *_, value = analyze_packet(packet)
+    return value
 
 
 def solve():
