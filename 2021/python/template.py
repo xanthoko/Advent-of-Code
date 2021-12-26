@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 from utils import get_input_text
 
@@ -8,11 +8,11 @@ EXAMPLE_INPUT = '''\
 # EXPECTED_2 =
 
 
-def get_input_data(example=False) -> None:
+def get_input_data(example: Optional[bool] = False) -> None:
     if example:
         input_text = EXAMPLE_INPUT
     else:
-        input_text = get_input_text(11)
+        input_text = get_input_text()
     # TODO: implement code here
     return
 
