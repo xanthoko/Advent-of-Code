@@ -1,5 +1,5 @@
 cp template.py day$1.py
 
-curl 'https://adventofcode.com/2021/day/14/input' \
-  -H 'cookie: session=53616c7465645f5f1f96053cb690c9c84213d85d199789b6d7c3c4545a7189d07e962cc6fbb0dc9dfcae08df56ccc9c0' \
+curl "https://adventofcode.com/2021/day/$1/input" \
+  -H "cookie: session=53616c7465645f5f2c78c10057f268e297c87f97d34c6c09f6cf7237120c40c0f9555d435e5c3d403717b733a1fcfbdc" \
   --compressed > ../inputs/day$1.txt

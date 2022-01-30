@@ -1,4 +1,3 @@
-import pytest
 from typing import List
 from statistics import median
 
@@ -18,7 +17,7 @@ def get_input_data(example=False):
         input_text = get_example_input_text()
     else:
         input_text = get_input_text(10)
-    return input_text.splitlines()
+    return input_text.strip().splitlines()
 
 
 lines = get_input_data()
@@ -55,22 +54,6 @@ def get_completion_middle_score(lines: List[str]) -> int:
             scores.append(line_score)
 
     return int(median(scores))
-
-
-@pytest.mark.parametrize(
-    ('input', 'expected'),
-    ((get_input_data(example=True), EXPECTED_1), ),
-)
-def test_part_1(input: str, expected: int) -> None:
-    assert get_syntax_error_score(input) == expected
-
-
-@pytest.mark.parametrize(
-    ('input', 'expected'),
-    ((get_input_data(example=True), EXPECTED_2), ),
-)
-def test_part_2(input: str, expected: int) -> None:
-    assert get_completion_middle_score(input) == expected
 
 
 def main():

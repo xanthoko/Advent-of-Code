@@ -7,7 +7,7 @@ from utils import get_input_text
 def get_input_grid() -> Dict[Tuple[int, int], int]:
     input_text = get_input_text(9)
     grid = {}
-    for y, line in enumerate(input_text.split('\n')):
+    for y, line in enumerate(input_text.strip().split('\n')):
         for x, c in enumerate(line):
             grid[(y, x)] = int(c)
     return grid

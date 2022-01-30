@@ -5,7 +5,7 @@ from utils import get_input_text
 
 def get_input_list() -> List[str]:
     input_text = get_input_text(2)
-    splited_str_input_list = input_text.split('\n')
+    splited_str_input_list = input_text.strip().split('\n')
     return splited_str_input_list
 
 

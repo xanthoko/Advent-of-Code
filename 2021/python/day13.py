@@ -34,7 +34,8 @@ def get_input_data(example=False) -> Tuple[Set[Tuple[int, int]], List[str]]:
     else:
         input_text = get_input_text(13)
 
-    coords, instructions = map(lambda x: x.split('\n'), input_text.split('\n\n'))
+    coords, instructions = map(lambda x: x.split('\n'),
+                               input_text.strip().split('\n\n'))
     grid = set(tuple(map(int, x.split(','))) for x in coords)
 
     return grid, instructions

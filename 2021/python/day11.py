@@ -25,7 +25,7 @@ def get_input_data(example=False) -> Dict[Tuple[int, int], int]:
         input_text = get_input_text(11)
 
     grid = {}
-    for y, line in enumerate(input_text.split()):
+    for y, line in enumerate(input_text.strip().split()):
         for x, c in enumerate(line):
             grid[(int(y), int(x))] = int(c)
     return grid

@@ -6,7 +6,7 @@ from utils import get_input_text
 
 def get_input_list() -> Tuple[List[int], numpy.ndarray]:
     input_text = get_input_text(4)
-    splited_str_input_list = input_text.split('\n\n')
+    splited_str_input_list = input_text.strip().split('\n\n')
 
     numbers_drawn = splited_str_input_list.pop(0)
     numbers_drawn = list(map(int, numbers_drawn.split(',')))
@@ -67,7 +67,6 @@ def _check_if_board_wins(board: numpy.ndarray):
 
 
 def _calculate_final_score(board: numpy.ndarray, number_drawn: int) -> int:
-    print(number_drawn)
     unmarked_sum = numpy.sum(board, where=board != -1)
     final_score = unmarked_sum * number_drawn
     return final_score
