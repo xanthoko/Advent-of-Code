@@ -1,5 +1,7 @@
-from typing import List, Dict, Tuple
 from itertools import product
+from typing import Dict
+from typing import List
+from typing import Tuple
 
 from utils import get_input_text
 
@@ -66,24 +68,23 @@ on x=-53470..21291,y=-120233..-33476,z=-44150..38147
 off x=-93533..-4276,y=-16170..68771,z=-104985..-24507
 '''
 # EXPECTED_1 = 590784
-# EXPECTED_2 =
+# EXPECTED_2 = 2758514936282235
 
 
-def get_input_data(example=False) -> List[Dict[str, str]]:
+def get_input_data(example: bool = False) -> Tuple[Dict[str, str]]:
     if example:
         input_text = EXAMPLE_INPUT
     else:
         input_text = get_input_text(22)
 
-    lines = input_text.strip().splitlines()
     steps = []
-    for line in lines:
+    for line in input_text.strip().splitlines():
         comm, coords = line.split()
         steps.append((comm, coords))
     return steps
 
 
-steps = get_input_data(True)
+steps = get_input_data(False)
 
 
 def solve_1() -> int:
@@ -108,37 +109,7 @@ def solve_1() -> int:
 
 
 def solve_2() -> int:
-    on_cubes = set()
-
-    xs, ys, zs = [], [], []
-    for i, step in enumerate(steps):
-        # print(f'step: {i}')
-        comm, coords = step
-        x_s, y_s, z_s = coords.split(',')
-        x_range_l = list(map(int, x_s.split('=')[1].split('..')))
-        y_range_l = list(map(int, y_s.split('=')[1].split('..')))
-        z_range_l = list(map(int, z_s.split('=')[1].split('..')))
-        x_range = range(x_range_l[0], x_range_l[1] + 1)
-        y_range = range(y_range_l[0], y_range_l[1] + 1)
-        z_range = range(z_range_l[0], z_range_l[1] + 1)
-        xs.extend(x_range_l)
-        ys.extend(y_range_l)
-        zs.extend(z_range_l)
-
-        if comm == 'on':
-            on_cubes.update(list(product(x_range, y_range, z_range)))
-
-        # for coord in product(x_range, y_range, z_range):
-        #     if comm == 'on':
-        #         on_cubes.add(coord)
-        #     else:
-        #         on_cubes.discard(coord)
-        # print(len(on_cubes))
-    print(min(xs), max(xs))
-    print(min(ys), max(ys))
-    print(min(zs), max(zs))
-
-    return len(on_cubes)
+    pass
 
 
 def solve():
