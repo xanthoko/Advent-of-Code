@@ -2,11 +2,9 @@ from __future__ import annotations
 
 import heapq
 from collections import defaultdict
-from email.generator import Generator
 from typing import Generator
 from typing import List
 from typing import NamedTuple
-from typing import Optional
 from typing import Set
 from typing import Tuple
 
@@ -16,21 +14,18 @@ EXAMPLE_INPUT = '''\
 #############
 #...........#
 ###B#C#B#D###
-  #D#C#B#A#
-  #D#B#A#C#
   #A#D#C#A#
   #########
 '''
 # EXPECTED_1 = 12521
-# EXPECTED_2 = 44169
 
 
 class Amphipod(NamedTuple):
     ind: int
     type: str
-    position: int
-    room: int
-    depth: int
+    position: int | None
+    room: int | None
+    depth: int | None
 
     def move_to_room(self, room: int, depth: int) -> Amphipod:
         return self._replace(room=room, depth=depth, position=None)
@@ -45,7 +40,10 @@ class Amphipod(NamedTuple):
 
     @property
     def location(self) -> int:
-        return self.room * 2 + 2 if self._is_in_room() else self.position
+        if self.room is None:
+            assert self.position is not None
+            return self.position
+        return self.room * 2 + 2
 
     @property
     def step(self) -> int:
@@ -64,7 +62,7 @@ class Amphipod(NamedTuple):
         return f'Amphi: {self.type}'
 
 
-def get_input_data(example: Optional[bool] = False) -> List[Amphipod]:
+def get_input_data(example: bool = False) -> List[Amphipod]:
     if example:
         input_text = EXAMPLE_INPUT
     else:
@@ -82,31 +80,31 @@ def get_input_data(example: Optional[bool] = False) -> List[Amphipod]:
 
 _amphis = get_input_data()
 restricted_hallway_pos = (2, 4, 6, 8)
-# destination_map = {0: 'A', 1: 'B', 2: 'C', 3: 'D'}
 destination_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
 
 
-def print_map(amphis: List[Amphipod]) -> None:
-    grid = """
+def print_map(amphis: Tuple[Amphipod, ...]) -> None:
+    grid_s = """
 #############
 #...........#
 ###.#.#.#.###
   #.#.#.#.#
   ######### """.strip()
-    grid = [list(line) for line in grid.split('\n')]
+    grid = [list(line) for line in grid_s.split('\n')]
 
     for amphi in amphis:
-        if amphi.room is not None:
+        if amphi.room is not None and amphi.depth is not None:
             grid[amphi.depth + 1][amphi.room * 2 + 3] = amphi.type
         else:
+            assert amphi.position is not None
             grid[1][amphi.position + 1] = amphi.type
 
     print('\n'.join(''.join(line) for line in grid))
     print()
 
 
-def _can_amphi_move_outside_of_room(amphi: Amphipod,
-                                    amphis: List[Amphipod]) -> bool:
+def _can_amphi_move_outside_of_room(amphi: Amphipod, amphis: Tuple[Amphipod,
+                                                                   ...]) -> bool:
     assert amphi._is_in_room()
 
     if amphi.depth == 1:
@@ -117,7 +115,7 @@ def _can_amphi_move_outside_of_room(amphi: Amphipod,
     return len(roomate) == 0
 
 
-def _is_amphi_settled(amphi: Amphipod, amphis: List[Amphipod]) -> bool:
+def _is_amphi_settled(amphi: Amphipod, amphis: Tuple[Amphipod, ...]) -> bool:
     if amphi.destination_room != amphi.room:  # not in destination room
         return False
 
@@ -132,11 +130,11 @@ def _is_amphi_settled(amphi: Amphipod, amphis: List[Amphipod]) -> bool:
     return roomates[0].type == amphi.type
 
 
-def _get_amphis_positions_in_hall(amphis: List[Amphipod]) -> Set[int]:
+def _get_amphis_positions_in_hall(amphis: Tuple[Amphipod, ...]) -> Set[int]:
     return set(x.position for x in amphis if x.position is not None)
 
 
-def _can_amphi_move_in_room(amphi: Amphipod, amphis: List[Amphipod],
+def _can_amphi_move_in_room(amphi: Amphipod, amphis: Tuple[Amphipod, ...],
                             room: int) -> Tuple[bool, int]:
     assert room == amphi.destination_room
 
@@ -153,8 +151,8 @@ def _can_amphi_move_in_room(amphi: Amphipod, amphis: List[Amphipod],
 
 
 def get_next_state(
-    state: Tuple[int, List[Amphipod]]
-) -> Generator[Tuple[int, List[Amphipod]], None, None]:
+    state: Tuple[int, Tuple[Amphipod, ...]]
+) -> Generator[Tuple[int, Tuple[Amphipod, ...]], None, None]:
     cost, amphipods = state
 
     for i, amphi in enumerate(amphipods):
@@ -167,7 +165,11 @@ def get_next_state(
         if _is_amphi_settled(amphi, amphipods):
             continue
 
-        out_cost = amphi.depth if amphi._is_in_room() else 0
+        if amphi._is_in_room():
+            assert amphi.depth is not None
+            out_cost = amphi.depth
+        else:
+            out_cost = 0
         location = amphi.location
 
         other_hallway_amphis = _get_amphis_positions_in_hall(amphipods)
@@ -241,7 +243,7 @@ def get_next_state(
             right_index += 1
 
 
-def detect_end(amphis: List[Amphipod]) -> bool:
+def detect_end(amphis: Tuple[Amphipod, ...]) -> bool:
     for amphi in amphis:
         if not amphi._is_in_room():
             return False
@@ -256,11 +258,10 @@ breadcrumbs = defaultdict(tuple)
 visited = set()
 cost = defaultdict(int)
 
-end_apods: List[Amphipod] = []
+end_apods: Tuple[Amphipod, ...] = tuple()
 ans = None
 
 pq = [start_state]
-ss = 0
 while len(pq) > 0:
     cur_cost, cur_apods = heapq.heappop(pq)
 
@@ -274,7 +275,6 @@ while len(pq) > 0:
         end_apods = cur_apods
         break
 
-    ss += 1
     for next_state in get_next_state((cur_cost, cur_apods)):
         if next_state[1] in visited:
             continue
@@ -290,4 +290,4 @@ print_map(end_apods)
 #     print_map(cur_apods)
 #     cur_apods = breadcrumbs[cur_apods]
 
-print(ans)
+print(f'Part 1: {ans}')
