@@ -24,7 +24,8 @@ def get_input_data() -> None:
     if is_production:
         input_text = get_input_text(dayOfInput)
     else:
-        input_text = EXAMPLE_INPUT.strip()
+        input_text = EXAMPLE_INPUT
+    input_text.strip()
     # TODO: implement code here
     return
 

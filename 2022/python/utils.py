@@ -36,7 +36,7 @@ def download_input_from_url(day):
         raise ValueError('Invalid session cookie')
 
     with open(f'../inputs/day{day:0>2}.txt', 'w') as f:
-        f.write(resp.text[:-1])  # remove the last \n
+        f.write(resp.text)
 
 
 if __name__ == '__main__':
