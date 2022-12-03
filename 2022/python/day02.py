@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 from typing import Optional
 
 from utils import get_input_text
@@ -12,16 +13,26 @@ C Z
 # EXPECTED_1 = 15
 # EXPECTED_2 = 12
 
+parser = argparse.ArgumentParser(prog='AoC')
+parser.add_argument('-p',
+                    '--production',
+                    required=False,
+                    const=True,
+                    nargs='?',
+                    default=False)
+is_production = parser.parse_args().production
 
-def get_input_data(example: Optional[bool] = False) -> None:
-    if example:
-        input_text = EXAMPLE_INPUT.strip()
-    else:
+
+def get_input_data() -> None:
+    if is_production:
         input_text = get_input_text(2)
+    else:
+        input_text = EXAMPLE_INPUT.strip()
     return input_text.strip().split('\n')
 
 
 input_data = get_input_data()
+
 shape_score = {'X': 1, 'Y': 2, 'Z': 3}
 pvp = {
     'A': ['Y', 'Z', 'X'],
