@@ -24,12 +24,8 @@ def download_input_from_url(day):
         '174f708e9795f1aaeec189f979c9d8f8d7f1e837a367cb6e9cdf057d4a3c9bbd7'
     cookies = {'session': session_cookie}
 
-    url_day = day
-    if day[0] == '0':
-        url_day = day[1:]
-
     try:
-        resp = requests.get(f'https://adventofcode.com/2022/day/{url_day}/input',
+        resp = requests.get(f'https://adventofcode.com/2022/day/{day}/input',
                             cookies=cookies)
     except requests.exceptions.ConnectionError:
         print('[ERROR] Could not connect to url')
@@ -39,7 +35,7 @@ def download_input_from_url(day):
         print(f'[ERROR] {resp.text}')
         raise ValueError('Invalid session cookie')
 
-    with open(f'../inputs/day{day}.txt', 'w') as f:
+    with open(f'../inputs/day{day:0>2}.txt', 'w') as f:
         f.write(resp.text[:-1])  # remove the last \n
 
 

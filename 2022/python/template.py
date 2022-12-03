@@ -15,7 +15,7 @@ def get_input_data(example: Optional[bool] = False) -> None:
     if example:
         input_text = EXAMPLE_INPUT
     else:
-        input_text = get_input_text()
+        input_text = get_input_text(dayOfInput)
     # TODO: implement code here
     return
 
