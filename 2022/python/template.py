@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import argparse
-from typing import Optional
 
 from utils import get_input_text
 
 EXAMPLE_INPUT = '''\
 '''
-# EXPECTED_1 =
-# EXPECTED_2 =
+EXPECTED_1 = None
+EXPECTED_2 = None
 
 parser = argparse.ArgumentParser(prog='AoC')
 parser.add_argument('-p',
@@ -43,12 +42,20 @@ def solve_2() -> int:
     pass
 
 
+def _validate(expected, actual):
+    if not is_production:
+        error_msg = f'\033[41mExpected: {expected}. Got: {actual}\033[m'
+        assert actual == expected, error_msg
+
+
 def solve():
     part_1 = solve_1()
     print(f'Part 1: {part_1}')
+    _validate(EXPECTED_1, part_1)
 
     part_2 = solve_2()
     print(f'Part 2: {part_2}')
+    _validate(EXPECTED_2, part_2)
 
 
 if __name__ == '__main__':
