@@ -38,15 +38,12 @@ def get_input_data() -> None:
     initial, moves = input_text.split('\n\n')
     lines = initial.splitlines()
     no_stacks = len(lines[-1].split())
-    stacks = []
-    for _ in range(no_stacks):
-        stacks.append([])
+    stacks = [[] for _ in range(no_stacks)]
 
     for line in lines[:-1]:
-        for i in range(no_stacks):
-            item = line[i * 4:i * 4 + 3]
-            if item != '   ':
-                stacks[i].insert(0, item[1])
+        for i, c in enumerate(line[1::4]):
+            if not c.isspace():
+                stacks[i].insert(0, c)
 
     return stacks, moves
 
