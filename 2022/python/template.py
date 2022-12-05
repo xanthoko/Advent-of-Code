@@ -24,7 +24,7 @@ def get_input_data() -> None:
         input_text = get_input_text(dayOfInput)
     else:
         input_text = EXAMPLE_INPUT
-    input_text.strip()
+    input_text.strip('\n')
     # TODO: implement code here
     return
 
