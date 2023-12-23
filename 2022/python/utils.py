@@ -20,8 +20,8 @@ def download_input_from_url(day):
     Raises:
         ValueError: Session cookie is invalid
     """
-    session_cookie = '53616c7465645f5f7c93f7f1391c4dc21b16da40630aec431a079c4103512ea'\
-        '174f708e9795f1aaeec189f979c9d8f8d7f1e837a367cb6e9cdf057d4a3c9bbd7'
+    session_cookie = '53616c7465645f5fea48bce577ada3276f18328538cfa6954c4b5181e9af'\
+        '6af99d04f5accf9716508ea63d44cba355ac8a6c8d04d1a1b7dbe693bed96f779044'
     cookies = {'session': session_cookie}
 
     try:
